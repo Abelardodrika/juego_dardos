@@ -2,7 +2,7 @@ from pathlib import Path
 import math
 import random
 import pygame
-from src.componentes import BarraPrecision, Dardo # <-- 1. IMPORTAMOS EL DARDO
+from src.componentes import BarraPrecision, Dardo 
 
 class JuegoDardos:
     def __init__(self, screen):
@@ -15,10 +15,14 @@ class JuegoDardos:
 
         self.BASE_DIR = Path(__file__).resolve().parent.parent
         self.IMAGES_DIR = self.BASE_DIR / "assets" / "images"
+        self.BACKGROUNDS_DIR = self.BASE_DIR / "assets" / "backgrounds"
         
         # Carga del tablero (500x500 en posición 390, 110)
         self.img_diana = pygame.image.load(str(self.IMAGES_DIR / "tablero" / "tablero.png")).convert_alpha()
         self.img_diana = pygame.transform.scale(self.img_diana, (500, 500))
+
+        self.img_fondo = pygame.image.load(str(self.BACKGROUNDS_DIR / "fondogame.png")).convert_alpha()
+        self.img_fondo = pygame.transform.scale(self.img_fondo, (self.WIDTH,self.HEIGHT)) 
 
         # Centro matemático exacto de la diana (390 + 250, 110 + 250)
         self.centro_x = 390 + (500 / 2) # 640
@@ -298,7 +302,7 @@ class JuegoDardos:
             self.screen.blit(txt_reiniciar, (45, 430))
 
     def dibujar(self):
-        self.screen.fill((30, 30, 40)) 
+        self.screen.blit(self.img_fondo, (0,0)) 
         
         # Tablero
         self.screen.blit(self.img_diana, (390, 110))
