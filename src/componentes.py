@@ -1,4 +1,4 @@
-import pygame # type: ignore
+import pygame 
 
 class BarraPrecision:
     def __init__(self, x, y, ancho, alto, orientacion="H", velocidad=5):
@@ -15,22 +15,21 @@ class BarraPrecision:
         else:
             self.indicador_pos = y
             
-        self.direccion = 1  # 1 significa avanzando, -1 retrocediendo
-        self.activo = True   # Controla si la barra se está moviendo o ya se detuvo
+        self.direccion = 1 
+        self.activo = True  
 
     def actualizar(self):
         if not self.activo:
             return
 
-        # Movimiento tipo Ping-Pong (Vaivén)
+       
         if self.orientacion == "H":
             self.indicador_pos += self.velocidad * self.direccion
-            # Si toca el borde derecho o izquierdo, cambia de dirección
+          
             if self.indicador_pos >= self.rect_barra.right or self.indicador_pos <= self.rect_barra.left:
                 self.direccion *= -1
         else:
             self.indicador_pos += self.velocidad * self.direccion
-            # Si toca el borde inferior o superior, cambia de dirección
             if self.indicador_pos >= self.rect_barra.bottom or self.indicador_pos <= self.rect_barra.top:
                 self.direccion *= -1
 
@@ -39,13 +38,10 @@ class BarraPrecision:
         return self.indicador_pos
 
     def dibujar(self, surface):
-        # Dibujar el fondo de la barra (Gris)
         pygame.draw.rect(surface, (100, 100, 100), self.rect_barra)
         
-        # Dibujar los bordes de la barra (Blanco)
         pygame.draw.rect(surface, (255, 255, 255), self.rect_barra, 2)
         
-        # Dibujar el indicador (Línea Roja de precisión)
         if self.orientacion == "H":
             pygame.draw.line(surface, (255, 0, 0), (self.indicador_pos, self.rect_barra.top), (self.indicador_pos, self.rect_barra.bottom), 4)
         else:
