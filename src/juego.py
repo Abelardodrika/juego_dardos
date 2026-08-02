@@ -113,7 +113,6 @@ class JuegoDardos:
             self.estado_actual = 'LANZAMIENTO'
 
     def calcular_puntuacion_exacta(self, x, y):
-        """Calcula el descuento exacto basado en el ángulo y radio."""
         dx = x - self.centro_x
         dy = y - self.centro_y
         distancia = math.sqrt(dx**2 + dy**2)
@@ -182,7 +181,6 @@ class JuegoDardos:
 
         self.estado_actual = 'RESULTADO'
 
-        # Victoria instantánea si alguien llega exactamente a 0
         if self.puntos_jugador == 0 or self.puntos_ia == 0:
             self.estado_actual = 'GAME_OVER'
 
@@ -203,7 +201,6 @@ class JuegoDardos:
         self.dardo_y = None
         self.tiempo_ia = pygame.time.get_ticks()
         
-        # --- 4. REINICIAMOS EL DARDO FÍSICO ABAJO PARA EL NUEVO TURNO ---
         self.dardo = Dardo(x_inicio=640, y_inicio=700)
         self.estado_actual = 'BARRA_H'
 
@@ -221,7 +218,6 @@ class JuegoDardos:
         self.dardo_x = None
         self.dardo_y = None
         
-        # --- 5. REINICIAR EL DARDO AL EMPEZAR UNA NUEVA PARTIDA ---
         self.dardo = Dardo(x_inicio=640, y_inicio=700)
         self.estado_actual = 'BARRA_H'
 
@@ -240,7 +236,6 @@ class JuegoDardos:
                 if abs(self.barra_v.indicador_pos - self.objetivo_ia_y) < 15 or (tiempo_actual - self.tiempo_ia > 1200):
                     self.dardo_y = self.barra_v.detener()
                     
-                    # --- 6. LA IA DETIENE LA BARRA V: EL DARDO EMPIEZA SU VUELO ---
                     self.dardo.iniciar_vuelo(self.dardo_x, self.dardo_y)
                     self.estado_actual = 'LANZAMIENTO'
         else:
