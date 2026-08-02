@@ -1,5 +1,5 @@
 from pathlib import Path
-import pygame # type: ignore
+import pygame 
 import math  
 
 class BarraPrecision:
