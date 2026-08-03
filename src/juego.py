@@ -16,7 +16,7 @@ class JuegoDardos:
         self.BASE_DIR = Path(__file__).resolve().parent.parent
         self.IMAGES_DIR = self.BASE_DIR / "assets" / "images"
         self.BACKGROUNDS_DIR = self.BASE_DIR / "assets" / "backgrounds"
-        self.FONTS_DIR = self.BASE_DIR / "assets" / "fonts"  # RUTA DE LA FUENTE
+        self.FONTS_DIR = self.BASE_DIR / "assets" / "fonts"  
         
         self.img_diana = pygame.image.load(str(self.IMAGES_DIR / "tablero" / "tablero.png")).convert_alpha()
         self.img_diana = pygame.transform.scale(self.img_diana, (500, 500))
