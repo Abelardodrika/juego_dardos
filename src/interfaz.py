@@ -23,7 +23,7 @@ class MenuPrincipal:
         pygame.font.init()
         ruta_fuente_arcade = str(self.FONTS_DIR / "PressStart2P-Regular.ttf")
         
-        self.fuente_boton = pygame.font.Font(ruta_fuente_arcade, 14)
+        self.fuente_boton = pygame.font.Font(ruta_fuente_arcade, 18)
         
         self.ancho_btn = 200
         self.alto_btn = 60
