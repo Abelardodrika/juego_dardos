@@ -24,6 +24,8 @@ def main():
     while running:
         if estado_pantalla == 'MENU':
             if menu.procesar_eventos():
+                juego.reiniciar_juego_completo()
+                juego.running = True
                 estado_pantalla = 'JUEGO'
             menu.dibujar()
             
@@ -33,7 +35,7 @@ def main():
             juego.dibujar()
             
             if not juego.running:
-                running = False
+                estado_pantalla = 'MENU'
                 
         clock.tick(60)
     
