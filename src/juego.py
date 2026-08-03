@@ -37,7 +37,7 @@ class JuegoDardos:
         
         self.dardo = Dardo(x_inicio=640, y_inicio=700)
         
-        self.historial_dardos = [] # Tuplas: (x, y, es_jugador)
+        self.historial_dardos = [] 
         
         self.PUNTAJE_INICIAL = 251
         self.puntos_jugador = self.PUNTAJE_INICIAL
@@ -58,7 +58,7 @@ class JuegoDardos:
         pygame.font.init()
         ruta_fuente_arcade = str(self.FONTS_DIR / "PressStart2P-Regular.ttf")
         
-        self.fuente_ui = pygame.font.Font(ruta_fuente_arcade, 12)
+        self.fuente_ui = pygame.font.Font(ruta_fuente_arcade, 14)
         self.fuente_grande = pygame.font.Font(ruta_fuente_arcade, 18)
         
         self.estado_actual = 'BARRA_H' 
@@ -78,6 +78,10 @@ class JuegoDardos:
                         self.pasar_siguiente_turno()
                     elif self.estado_actual == 'GAME_OVER':
                         self.reiniciar_juego_completo()
+                elif event.key == pygame.K_m:
+                    if self.estado_actual == 'GAME_OVER':
+                        self.running = False
+            
                     
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -248,17 +252,17 @@ class JuegoDardos:
 
         self.screen.blit(txt_turno, (45, 140))
         self.screen.blit(txt_j1, (45, 200))
-        self.screen.blit(txt_d_j1, (45, 230))
+        self.screen.blit(txt_d_j1, (45, 235))
         
-        self.screen.blit(txt_ia, (45, 290))
-        self.screen.blit(txt_d_ia, (45, 320))
+        self.screen.blit(txt_ia, (45, 300))
+        self.screen.blit(txt_d_ia, (45, 335))
         
         if self.estado_actual == 'RESULTADO' and self.texto_evaluacion:
             txt_eval = self.fuente_ui.render(self.texto_evaluacion, True, (255, 220, 0))
-            self.screen.blit(txt_eval, (45, 380))
+            self.screen.blit(txt_eval, (45, 400))
             
             txt_cont = self.fuente_ui.render("PRESS SPACE...", True, (130, 130, 130))
-            self.screen.blit(txt_cont, (45, 440))
+            self.screen.blit(txt_cont, (45, 450))
 
         if self.estado_actual == 'GAME_OVER':
             if self.puntos_jugador < self.puntos_ia:
@@ -273,8 +277,10 @@ class JuegoDardos:
                 
             txt_go = self.fuente_grande.render(res_txt, True, col_res)
             txt_reiniciar = self.fuente_ui.render("SPACE TO RESTART", True, (255, 255, 255))
-            self.screen.blit(txt_go, (45, 390))
+            txt_menu = self.fuente_ui.render("PRESS M FOR MENU", True, (255, 150, 0))
+            self.screen.blit(txt_go, (45, 395))
             self.screen.blit(txt_reiniciar, (45, 440))
+            self.screen.blit(txt_menu, (45, 475))
 
     def dibujar(self):
         self.screen.blit(self.img_fondo, (0, 0)) 
