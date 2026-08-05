@@ -3,12 +3,14 @@ import math
 import random
 import pygame
 from src.componentes import BarraPrecision, Dardo 
+from src.audio import GestorAudio
 
 class JuegoDardos:
-    def __init__(self, screen):
+    def __init__(self, screen, musica_activa=True):
         self.screen = screen
         self.running = True 
         self.clock = pygame.time.Clock()
+        self.musica_activa = musica_activa  
         
         self.WIDTH = screen.get_width()
         self.HEIGHT = screen.get_height()
@@ -16,7 +18,7 @@ class JuegoDardos:
         self.BASE_DIR = Path(__file__).resolve().parent.parent
         self.IMAGES_DIR = self.BASE_DIR / "assets" / "images"
         self.BACKGROUNDS_DIR = self.BASE_DIR / "assets" / "backgrounds"
-        self.FONTS_DIR = self.BASE_DIR / "assets" / "fonts"  
+        self.FONTS_DIR = self.BASE_DIR / "assets" / "fonts"
         
         self.img_diana = pygame.image.load(str(self.IMAGES_DIR / "tablero" / "tablero.png")).convert_alpha()
         self.img_diana = pygame.transform.scale(self.img_diana, (500, 500))
@@ -24,8 +26,8 @@ class JuegoDardos:
         self.img_fondo = pygame.image.load(str(self.BACKGROUNDS_DIR / "fondogame.png")).convert_alpha()
         self.img_fondo = pygame.transform.scale(self.img_fondo, (self.WIDTH, self.HEIGHT)) 
 
-        self.centro_x = 390 + (500 / 2) 
-        self.centro_y = 110 + (500 / 2) 
+        self.centro_x = 390 + (500 / 2) # 640
+        self.centro_y = 110 + (500 / 2) # 360
 
         self.SECTORES = [20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5]
 
@@ -57,11 +59,20 @@ class JuegoDardos:
 
         pygame.font.init()
         ruta_fuente_arcade = str(self.FONTS_DIR / "PressStart2P-Regular.ttf")
-        
         self.fuente_ui = pygame.font.Font(ruta_fuente_arcade, 14)
         self.fuente_grande = pygame.font.Font(ruta_fuente_arcade, 18)
         
         self.estado_actual = 'BARRA_H' 
+
+        self.audio = GestorAudio()
+
+        if self.musica_activa:
+            self.audio.cargar_musica_fondo("musica_juego.mp3") 
+        
+        self.audio.cargar_efecto("victoria", "victoria.mp3")
+        self.audio.cargar_efecto("derrota", "derrota.mp3")
+    
+        self.sonido_game_over_reproducido = False
 
     def procesar_eventos(self):
         for event in pygame.event.get():
@@ -80,9 +91,9 @@ class JuegoDardos:
                         self.reiniciar_juego_completo()
                 elif event.key == pygame.K_m:
                     if self.estado_actual == 'GAME_OVER':
+                        self.audio.cargar_musica_fondo('musica_juego.mp3')
                         self.running = False
             
-                    
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
                     if self.turno_actual == 'JUGADOR' and self.estado_actual in ['BARRA_H', 'BARRA_V']:
@@ -113,15 +124,15 @@ class JuegoDardos:
         dy = y - self.centro_y
         distancia = math.sqrt(dx**2 + dy**2)
 
-        if distancia > 210:
-            self.texto_evaluacion = "OUT OF BOARD!"
+        if distancia > 145:
+            self.texto_evaluacion = "OUT OF BOARD! (0)"
             return 0
 
         if distancia <= 10:
             self.texto_evaluacion = "DBL BULLSEYE! (-50)"
             return 50
 
-        if distancia <= 25:
+        if distancia <= 22:
             self.texto_evaluacion = "SGL BULLSEYE! (-25)"
             return 25
 
@@ -131,10 +142,10 @@ class JuegoDardos:
         indice_sector = int(((angulo_reloj + 9) % 360) / 18)
         numero_base = self.SECTORES[indice_sector]
 
-        if 110 <= distancia <= 130:
+        if 75 <= distancia <= 90:
             multiplicador = 3
             tipo = f"TRIPLE {numero_base}"
-        elif 190 <= distancia <= 210:
+        elif 130 <= distancia <= 145:
             multiplicador = 2
             tipo = f"DOUBLE {numero_base}"
         else:
@@ -146,6 +157,8 @@ class JuegoDardos:
         return puntos_obtenidos
 
     def procesar_impacto(self):
+        self.audio.reproducir_efecto("impacto")
+
         puntos_descuento = self.calcular_puntuacion_exacta(self.dardo_x, self.dardo_y)
         self.ultimo_descuento = puntos_descuento
 
@@ -168,12 +181,25 @@ class JuegoDardos:
 
         self.estado_actual = 'RESULTADO'
 
-        if self.puntos_jugador == 0 or self.puntos_ia == 0:
+        if self.puntos_jugador == 0 or self.puntos_ia == 0 or (self.dardos_jugador == 0 and self.dardos_ia == 0):
             self.estado_actual = 'GAME_OVER'
+            self.gestionar_fin_juego()
+
+    def gestionar_fin_juego(self):
+        if not self.sonido_game_over_reproducido:
+            self.audio.detener_musica() 
+            
+            if self.puntos_jugador < self.puntos_ia:
+                self.audio.reproducir_efecto("victoria")
+            else:
+                self.audio.reproducir_efecto("derrota")
+                
+            self.sonido_game_over_reproducido = True
 
     def pasar_siguiente_turno(self):
         if self.puntos_jugador == 0 or self.puntos_ia == 0 or (self.dardos_jugador == 0 and self.dardos_ia == 0):
             self.estado_actual = 'GAME_OVER'
+            self.gestionar_fin_juego()
             return
 
         if self.turno_actual == 'JUGADOR' and self.dardos_ia > 0:
@@ -207,6 +233,10 @@ class JuegoDardos:
         
         self.dardo = Dardo(x_inicio=640, y_inicio=700)
         self.estado_actual = 'BARRA_H'
+
+        self.sonido_game_over_reproducido = False
+        if self.musica_activa:
+            self.audio.cargar_musica_fondo("musica_juego.mp3")
 
     def actualizar(self):
         if self.turno_actual == 'IA':
@@ -258,7 +288,8 @@ class JuegoDardos:
         self.screen.blit(txt_d_ia, (45, 335))
         
         if self.estado_actual == 'RESULTADO' and self.texto_evaluacion:
-            txt_eval = self.fuente_ui.render(self.texto_evaluacion, True, (255, 220, 0))
+            col_eval = (0, 255, 255) if self.turno_actual == 'JUGADOR' else (255, 150, 0)
+            txt_eval = self.fuente_ui.render(self.texto_evaluacion, True, col_eval)
             self.screen.blit(txt_eval, (45, 400))
             
             txt_cont = self.fuente_ui.render("PRESS SPACE...", True, (130, 130, 130))
