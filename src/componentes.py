@@ -1,10 +1,10 @@
 from pathlib import Path
 import pygame 
-import math  
+import math   
 
 class BarraPrecision:
     def __init__(self, x, y, ancho, alto, orientacion="H", velocidad=5):
-        
+       
         self.rect_barra = pygame.Rect(x, y, ancho, alto)
         self.orientacion = orientacion
         self.velocidad = velocidad
@@ -14,8 +14,8 @@ class BarraPrecision:
         else:
             self.indicador_pos = y
             
-        self.direccion = 1  # 1 significa avanzando, -1 retrocediendo
-        self.activo = True   # Controla si la barra se está moviendo o ya se detuvo
+        self.direccion = 1 
+        self.activo = True  
 
         self.BASE_DIR = Path(__file__).resolve().parent.parent
         self.IMAGES_DIR = self.BASE_DIR / "assets" / "images"
@@ -122,7 +122,6 @@ class Dardo:
         dy = self.destino_y - self.y
         distancia_actual = math.hypot(dx, dy)
         
-        # Progreso del vuelo: va de 0.0 (inicio) a 1.0 (impacto)
         progreso = 1.0 - (distancia_actual / self.distancia_total)
         
         desviacion_y = 4 * self.altura_arco * progreso * (1 - progreso)
@@ -134,3 +133,56 @@ class Dardo:
         pos_y = y_int - self.alto_actual // 2 
         
         surface.blit(self.img_dardo, (pos_x, pos_y))
+
+class Boton:
+
+  def __init__(
+      self,
+      x,
+      y,
+      ancho,
+      alto,
+      texto,
+      color_bg=(60, 60, 80),
+      color_texto=(255, 255, 255),
+      tamano_fuente=14,
+  ):
+    self.rect = pygame.Rect(x, y, ancho, alto)
+    self.texto = texto
+    self.color_bg = color_bg
+
+    self.color_hover = (
+        min(color_bg[0] + 30, 255),
+        min(color_bg[1] + 30, 255),
+        min(color_bg[2] + 30, 255),
+    )
+    self.color_texto = color_texto
+
+    self.BASE_DIR = Path(__file__).resolve().parent.parent
+    self.FONTS_DIR = self.BASE_DIR / "assets" / "fonts"
+    ruta_fuente = self.FONTS_DIR / "PressStart2P-Regular.ttf"
+
+    self.fuente = pygame.font.Font(str(ruta_fuente), tamano_fuente)
+
+  def dibujar(self, surface):
+    pos_mouse = pygame.mouse.get_pos()
+    color_actual = (
+        self.color_hover
+        if self.rect.collidepoint(pos_mouse)
+        else self.color_bg
+    )
+
+    pygame.draw.rect(surface, color_actual, self.rect, border_radius=6)
+    pygame.draw.rect(
+        surface, (150, 150, 200), self.rect, width=2, border_radius=6
+    )
+
+    txt_surface = self.fuente.render(self.texto, True, self.color_texto)
+    txt_rect = txt_surface.get_rect(center=self.rect.center)
+    surface.blit(txt_surface, txt_rect)
+
+  def fue_clicado(self, event):
+    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+      if self.rect.collidepoint(event.pos):
+        return True
+    return False
