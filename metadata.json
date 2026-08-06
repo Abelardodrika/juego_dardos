@@ -4,5 +4,5 @@
     "description": "Juego retro de tiras de precisión",
     "authors": ["Krischel Moret", "Abelardo Drika"],
     "group_number": 7,
-    "cover_path": "assets/covers/launcher_cover.png"
+    "cover_path": "assets/cover/launcher_cover.png"
 }
